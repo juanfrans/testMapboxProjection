@@ -1,67 +1,221 @@
-mapboxgl.accessToken = 'pk.eyJ1IjoiamZzMjExOCIsImEiOiJlMUQzd2YwIn0.WLb3PYDt2z-XttOLFcQlVQ';
+mapboxgl.accessToken = 'pk.eyJ1IjoibGV4eWFydGh1ciIsImEiOiJja3gwc3M3dHoxN3ByMnZteDNudDlpdnZpIn0.HXYwk_xfqXfstu4CSVHVpQ';
 var map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/jfs2118/cl3ugxsz1000r14pnfjd10lmj',
-    zoom: 3.5,
-    maxZoom: 9,
-    minZoom: 3,
-    center: [-85.5, 37.7],
-    projection: "albers"
+    style: 'mapbox://styles/lexyarthur/cl4up1owl000i14qoolt282hd',
+    zoom: 3.1,
+    maxZoom: 7,
+    minZoom: 2.5,
+    center: [-95.644, 39.647],
+    projection: 'albers'
+});
+  
+    
+
+
+
+
+map.on('load', function () {
+    // This is the function that finds the first symbol layer
+    let layers = map.getStyle().layers;
+    let firstSymbolId;
+    for (var i = 0; i < layers.length; i++) {
+        if (layers[i].type === 'symbol') {
+            firstSymbolId = layers[i].id;
+            break;
+        }
+    }
+  
+    map.addLayer(
+      {
+        id: "state_wildfire_layer",
+        type: "fill",
+        source: {
+          type: "geojson",
+          data: "data/statesData.geojson",
+        },
+        minzoom: .5,
+        paint: {
+          "fill-color": [
+              'interpolate',
+              ['linear'],
+              ['get', 'Expected Annual HU Exposed'],
+              46.8,
+              '#ffffb2',
+              198.8,
+              '#fed976',
+              535.6,
+              '#feb24c',
+              793.8,
+              '#fd8d3c',
+              13653,
+              '#fc4e2a',
+            ],
+          "fill-opacity": 0.75
+        }
+      }, 'waterway-label');
+
 });
 
-map.on("load", function () {
-    // This is the function that finds the first symbol layer
-    // let layers = map.getStyle().layers;
-    // for (var i = 0; i < layers.length; i++) {
-    //     console.log(layers[i].id);
-    // }
 
-    map.addLayer({
-      id: "counties",
-      type: "fill",
-      source: {
-        type: "geojson",
-        data: "data/countyTypologyCodes.geojson",
-      },
-      paint: {
-        "fill-color": "#ffffff",
-        "fill-outline-color" : "blue"
-      },
-    }, "waterway-label"
-    );
-    
-  });
-  
-// Create the popup
-map.on('click', 'us_states_elections', function (e) {
-    var stateName = e.features[0].properties.State;
-    var winner = e.features[0].properties.Winner;
-    var imagePath;
-    if (winner == 'Donald J Trump'){
-        imagePath = 'img/trump.jpg';
-    }
-    else{
-        imagePath = 'img/biden.jpg';
-    }
-    var wnrPerc = e.features[0].properties.WnrPerc;
-    var totalVotes = e.features[0].properties.Total;
-    wnrPerc = (wnrPerc * 100).toFixed(0);
-    totalVotes = totalVotes.toLocaleString();
-    stateName = stateName.toUpperCase();
-    console.log(imagePath);
+
+
+
+
+
+//Create the popup
+
+
+
+map.on('click', 'state_wildfire_layer', function (e) {
+    var state = e.features[0].properties.NAME;
+    var exposedHUs = e.features[0].properties['Total number of exposed HUs'];
+    var EAHUsExposed = e.features[0].properties['Expected Annual HU Exposed'];
+    var pctDirectExposure = e.features[0].properties['Fraction EAHUexposed-Direct'];
+    // var total = e.features[0].properties.total;
+    // pctChange = (pctChange * 100).toFixed(0);
+    // pctChange = pctChange.toLocaleString();
+    // countryName = stateName.toUpperCase()
     new mapboxgl.Popup()
         .setLngLat(e.lngLat)
-        .setHTML('<h4>'+stateName+'</h4>'
-            +'<h2>'+winner+'</h2>'
-            + '<p>'+wnrPerc+'% - ('+totalVotes+' votes)<br>'
-            + '<img src="' + imagePath + '"></p>')
+        .setHTML('<h2>' + state + '</h2>'
+            + '<h4>' + 'Total exposed —' + exposedHUs + ' housing units' + '</h4>'
+            + '<h3>' + 'Expected Annual Exposed: ' + EAHUsExposed + ' HUs' + '</h3>'
+            + '<h3>' + 'Expected Annual HUs with Direct Exposure: ' + pctDirectExposure * 100 + '%' + '</h3>')
         .addTo(map);
 });
-// Change the cursor to a pointer when the mouse is over the us_states_elections layer.
-map.on('mouseenter', 'us_states_elections', function () {
+map.on('mouseenter', 'state_wildfire_layer', function () {
     map.getCanvas().style.cursor = 'pointer';
 });
-// Change it back to a pointer when it leaves.
-map.on('mouseleave', 'us_states_elections', function () {
+map.on('mouseleave', 'state_wildfire_layer', function () {
     map.getCanvas().style.cursor = '';
 });
+
+
+
+
+
+//second map
+
+mapboxgl.accessToken = 'pk.eyJ1IjoibGV4eWFydGh1ciIsImEiOiJja3gwc3M3dHoxN3ByMnZteDNudDlpdnZpIn0.HXYwk_xfqXfstu4CSVHVpQ';
+var map2 = new mapboxgl.Map({
+    container: 'map2',
+    style: 'mapbox://styles/lexyarthur/cl4w0r1gk004714p55fnxd94y', 
+    zoom: 4.8,
+    // maxZoom: 9,
+    // minZoom: 3,
+    center: [-120.818, 37.024],
+    projection: 'albers'
+});
+  
+    
+
+
+map2.on('load', function () {
+    // This is the function that finds the first symbol layer
+    let layers = map2.getStyle().layers;
+    let firstSymbolId;
+    for (var i = 0; i < layers.length; i++) {
+        if (layers[i].type === 'symbol') {
+            firstSymbolId = layers[i].id;
+            break;
+        }
+    }
+
+    map2.addLayer(
+    {
+        id: "cali_wildfire_layer",
+        type: "fill",
+        source: {
+        type: "geojson",
+        data: "data/caliData.geojson",
+        },
+        maxzoom: 5,
+        paint: {
+        "fill-color": '#fc4e2a',
+        "fill-opacity": 0.75
+        }
+    }, 'waterway-label');
+
+
+    map2.addLayer(
+        {
+          id: "cali_counties_outline",
+          type: "line",
+          source: {
+            type: "geojson",
+            data: "data/caliCounties.geojson",
+          },
+          minzoom: 5,
+          paint: {
+            "line-color": "#ffffff",
+            "line-width": 0.25,
+          },
+        },
+        "cali_wildfire_layer"
+    );
+
+
+
+    map2.addLayer(
+        {
+          id: "cali_counties",
+          type: "fill",
+          source: {
+            type: "geojson",
+            data: "data/caliCounties.geojson",
+          },
+          minzoom: 5,
+          paint: {
+            "fill-color": [
+                'interpolate',
+                ['linear'],
+                ['get', 'Expected Annual HU Exposed'],
+                46.8,
+                '#ffffb2',
+                49,
+                '#fed976',
+                109.8,
+                '#feb24c',
+                171.8,
+                '#fd8d3c',
+                3416,
+                '#fc4e2a',
+              ],
+            "fill-opacity": 0.75,
+          },
+
+    }, 'cali_counties_outline');
+
+});
+
+
+
+//Popup
+
+
+
+map2.on('click', 'cali_counties', function (e) {
+    var county = e.features[0].properties.NAME_x;
+    var exposedHUs = e.features[0].properties['Total number of exposed HUs'];
+    var EAHUsExposed = e.features[0].properties['Expected Annual HU Exposed'];
+    var pctDirectExposure = e.features[0].properties['Fraction EAHUexposed-Direct'];
+    // var total = e.features[0].properties.total;
+    // pctChange = (pctChange * 100).toFixed(0);
+    // pctChange = pctChange.toLocaleString();
+    // countryName = stateName.toUpperCase()
+    new mapboxgl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML('<h2>' + county + '</h2>'
+            + '<h4>' + 'Total exposed —' + exposedHUs + ' housing units' + '</h4>'
+            + '<h3>' + 'Expected Annual Exposed: ' + EAHUsExposed + ' HUs' + '</h3>'
+            + '<h3>' + 'Expected Annual HUs with Direct Exposure: ' + pctDirectExposure  + '%' + '</h3>')
+        .addTo(map2);
+});
+map2.on('mouseenter', 'cali_counties', function () {
+    map2.getCanvas().style.cursor = 'pointer';
+});
+map2.on('mouseleave', 'cali_counties', function () {
+    map2.getCanvas().style.cursor = '';
+});
+
+
